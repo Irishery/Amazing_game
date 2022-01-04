@@ -1,3 +1,5 @@
+import pygame
+
 WIN_WIDTH = 640
 WIN_HEIGHT = 480
 TILESIZE = 32
@@ -15,6 +17,8 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
+
+PLAYER_HIT_RECT = pygame.Rect(0, 0, 35, 35)
 
 tilemap = [
     'BBBBBBBBBBBBBBBBBBBB',

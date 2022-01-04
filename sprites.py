@@ -71,23 +71,15 @@ class Player(pygame.sprite.Sprite):
     def movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            for sprite in self.game.all_sprites:
-                sprite.rect.x += PLAYER_SPEED
             self.x_change -= PLAYER_SPEED
             self.facing = 'left'
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            for sprite in self.game.all_sprites:
-                sprite.rect.x -= PLAYER_SPEED
             self.x_change += PLAYER_SPEED
             self.facing = 'right'
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
-            for sprite in self.game.all_sprites:
-                sprite.rect.y += PLAYER_SPEED
             self.y_change -= PLAYER_SPEED
             self.facing = 'up'
         elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            for sprite in self.game.all_sprites:
-                sprite.rect.y -= PLAYER_SPEED
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
 
@@ -103,24 +95,20 @@ class Player(pygame.sprite.Sprite):
             if hits:
                 if self.x_change > 0:
                     self.rect.x = hits[0].rect.left - self.rect.width
-                    for sprite in self.game.all_sprites:
-                        sprite.rect.x += PLAYER_SPEED
+                    return
                 if self.x_change < 0:
                     self.rect.x = hits[0].rect.right
-                    for sprite in self.game.all_sprites:
-                        sprite.rect.x -= PLAYER_SPEED
+                    return
 
         if direction == 'y':
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
                 if self.y_change > 0:
                     self.rect.y = hits[0].rect.top - self.rect.height
-                    for sprite in self.game.all_sprites:
-                        sprite.rect.y += PLAYER_SPEED
+                    return
                 if self.y_change < 0:
                     self.rect.y = hits[0].rect.bottom
-                    for sprite in self.game.all_sprites:
-                        sprite.rect.y -= PLAYER_SPEED
+                    return
 
     def animate(self):
         if self.facing == 'down':
@@ -198,6 +186,7 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.movement()
         self.animate()
+        # self.collide_enemy()
 
         self.rect.x += self.x_change
         self.rect.y += self.y_change
@@ -239,23 +228,15 @@ class Enemy(pygame.sprite.Sprite):
 
 
 class Block(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
+    def __init__(self, game, x, y, w, h):
+        self.groups = game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
-
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-
-        self.image = self.game.terrain_spritesheet.get_sprite(960, 440, self.width, self.height)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.game = game
+        self.rect = pygame.Rect(x, y, w, h)
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
 
 
 class Ground(pygame.sprite.Sprite):
@@ -277,7 +258,7 @@ class Ground(pygame.sprite.Sprite):
         self.rect.y = self.y
 
 
-class Button():
+class Button:
     def __init__(self, x, y, width, height, fg, bg, content, fontsize):
         self.font = pygame.font.Font('arialmt.ttf', fontsize)
         self.content = content

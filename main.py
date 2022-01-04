@@ -1,7 +1,8 @@
 import pygame
+import sys
 from sprites import *
 from config import *
-import sys
+from tilemap import *
 
 
 class Game:
@@ -18,17 +19,15 @@ class Game:
         self.attack_spritesheet = Spritesheet("img/attack.png")
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.go_background = pygame.image.load("img/gameover.png")
+        self.map = TiledMap("map_sprites/test_tile.tmx")
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
 
     def create_tilemap(self):
-        for i, row in enumerate(tilemap):
-            for j, column in enumerate(row):
-                Ground(self, j, i)
-                if column == 'B':
-                    Block(self, j, i)
-                if column == 'E':
-                    Enemy(self, j, i)
-                if column == 'P':
-                    self.player = Player(self, j, i)
+        for tile_object in self.map.tmxdata.objects:
+            if tile_object.name == 'wall':
+                Block(self, tile_object.x, tile_object.y,
+                      tile_object.width, tile_object.height)
 
     def new(self):
         self.playing = True
@@ -37,6 +36,8 @@ class Game:
         self.blocks = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
+        self.player = Player(self, 1, 1)
+        self.camera = Camera(self.map.width, self.map.height)
 
         self.create_tilemap()
 
@@ -59,10 +60,13 @@ class Game:
 
     def update(self):
         self.all_sprites.update()
+        self.camera.update(self.player)
 
     def draw(self):
-        self.screen.fill(BLACK)
-        self.all_sprites.draw(self.screen)
+        pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
+        self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
+        for sprite in self.all_sprites:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
         self.clock.tick(FPS)
         pygame.display.update()
 
