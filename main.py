@@ -3,6 +3,8 @@ import sys
 from sprites import *
 from config import *
 from tilemap import *
+from inventory import *
+from character import Character
 
 
 class Game:
@@ -13,21 +15,33 @@ class Game:
         self.running = True
         self.font = pygame.font.Font('arialmt.ttf', 32)
 
+        self.character = Character(7, 3, 2, 1)
+        self.inventory = Inventory(self.character.hp, self)
+
         self.character_spritesheet = Spritesheet("img/character.png")
         self.terrain_spritesheet = Spritesheet("img/terrain.png")
         self.enemy_spritesheet = Spritesheet("img/enemy.png")
         self.attack_spritesheet = Spritesheet("img/attack.png")
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.go_background = pygame.image.load("img/gameover.png")
-        self.map = TiledMap("map_sprites/test_tile.tmx")
+        self.map = TiledMap("map_sprites2/map1.tmx")
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
 
     def create_tilemap(self):
         for tile_object in self.map.tmxdata.objects:
-            if tile_object.name == 'wall':
+            if tile_object.name == 'block':
                 Block(self, tile_object.x, tile_object.y,
                       tile_object.width, tile_object.height)
+            if tile_object.name == 'player':
+                self.player = Player(self, tile_object.x, tile_object.y)
+                self.spawn_point = (tile_object.x, tile_object.y)
+            if tile_object.name == 'enemy':
+                Enemy(self, tile_object.x, tile_object.y)
+
+    def respawn(self):
+        self.character.hp = 7
+        self.player = Player(self, self.spawn_point[0], self.spawn_point[1])
 
     def new(self):
         self.playing = True
@@ -36,10 +50,9 @@ class Game:
         self.blocks = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
-        self.player = Player(self, 1, 1)
-        self.camera = Camera(self.map.width, self.map.height)
-
+        # self.player = Player(self, 10, 10)
         self.create_tilemap()
+        self.camera = Camera(self.map.width, self.map.height)
 
     def events(self):
         for event in pygame.event.get():
@@ -57,6 +70,9 @@ class Game:
                         Attack(self, self.player.rect.x - TILESIZE, self.player.rect.y)
                     if self.player.facing == 'right':
                         Attack(self, self.player.rect.x + TILESIZE, self.player.rect.y)
+                if event.key == pygame.K_i:
+                    self.inventory.render(self.screen)
+                    pygame.display.update()
 
     def update(self):
         self.all_sprites.update()
@@ -119,7 +135,6 @@ class Game:
 
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
-            print(mouse_pressed)
 
             if play_button.is_pressed(mouse_pos, mouse_pressed):
                 intro = False
@@ -134,6 +149,24 @@ class Game:
 g = Game()
 g.intro_screen()
 g.new()
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 5, 'sword', 'Ukraine'))
+g.inventory.add_item(Weapon('img', 1, 2, 'axe', 'Small axe'))
+g.inventory.add_item(Weapon('img', 1, 0, 'Very low', 'IQ'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+
+
 while g.running:
     g.main()
     g.game_over()

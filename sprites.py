@@ -22,10 +22,10 @@ class Player(pygame.sprite.Sprite):
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
 
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        self.x = x
+        self.y = y
+        self.width = 38
+        self.height = 52
 
         self.x_change = 0
         self.y_change = 0
@@ -102,8 +102,15 @@ class Player(pygame.sprite.Sprite):
     def collide_enemy(self):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if hits:
+            self.game.character.hp -= 0.5
+            self.attacked()
+        if self.game.character.hp <= 0:
             self.kill()
-            self.game.playing = False
+            self.game.respawn()
+
+    def attacked(self):
+        self.rect.x -= 30
+        self.rect.y -= 30
 
     def collide_blocks(self, direction):
         if direction == 'x':
@@ -132,7 +139,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.game.character_spritesheet.get_sprite(0, 130, 38, 52)
             else:
                 self.image = self.down_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
+                self.animation_loop += 0.2
                 if self.animation_loop >= 7:
                     self.animation_loop = 1
 
@@ -141,7 +148,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.game.character_spritesheet.get_sprite(0, 0, 38, 52)
             else:
                 self.image = self.up_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
+                self.animation_loop += 0.2
                 if self.animation_loop >= 7:
                     self.animation_loop = 1
 
@@ -150,7 +157,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.game.character_spritesheet.get_sprite(0, 65, 38, 52)
             else:
                 self.image = self.left_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
+                self.animation_loop += 0.2
                 if self.animation_loop >= 7:
                     self.animation_loop = 1
 
@@ -159,7 +166,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.game.character_spritesheet.get_sprite(0, 194, 38, 52)
             else:
                 self.image = self.right_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
+                self.animation_loop += 0.2
                 if self.animation_loop >= 7:
                     self.animation_loop = 1
 
@@ -171,8 +178,8 @@ class Enemy(pygame.sprite.Sprite):
         self.groups = self.game.all_sprites, self.game.enemies
         pygame.sprite.Sprite.__init__(self, self.groups)
 
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
+        self.x = x
+        self.y = y
         self.width = TILESIZE
         self.height = TILESIZE
 
@@ -303,6 +310,8 @@ class Button:
     def is_pressed(self, pos, pressed):
         if self.rect.collidepoint(pos):
             if pressed[0]:
+                print((self.rect.x, self.rect.y))
+                print(pos)
                 return True
             return False
         return False
