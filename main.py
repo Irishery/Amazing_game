@@ -63,13 +63,13 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     if self.player.facing == 'up':
-                        Attack(self, self.player.rect.x, self.player.rect.y - TILESIZE)
+                        Attack(self, self.player.rect.x, self.player.rect.y - 25)
                     if self.player.facing == 'down':
-                        Attack(self, self.player.rect.x, self.player.rect.y + TILESIZE)
+                        Attack(self, self.player.rect.x, self.player.rect.y + 45)
                     if self.player.facing == 'left':
-                        Attack(self, self.player.rect.x - TILESIZE, self.player.rect.y)
+                        Attack(self, self.player.rect.x - TILESIZE, self.player.rect.y + 25)
                     if self.player.facing == 'right':
-                        Attack(self, self.player.rect.x + TILESIZE, self.player.rect.y)
+                        Attack(self, self.player.rect.x + TILESIZE, self.player.rect.y + 20)
                 if event.key == pygame.K_i:
                     self.inventory.render(self.screen)
                     pygame.display.update()
