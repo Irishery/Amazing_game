@@ -33,19 +33,21 @@ class Dialog:
         self.game.draw()
         self.surf.fill(BLACK)
 
+    def blit_rows(self, phrase):
+        for num, line in enumerate(phrase.split('\n')):
+            text = self.font.render(f'{line}', True, WHITE)
+            self.surf.blit(text, (135, 15 + 16 * num))
+
     def render_dwin(self, screen, phrase=None):
         self.surf.blit(self.avatar, self.as_pos)
         props = self.npc.get_vars()
 
         for num, prop in enumerate(props.keys()):
             if phrase:
-                for num, line in enumerate(phrase.split('\n')):
-                    text = self.font.render(f'{line}', True, WHITE)
-                    self.surf.blit(text, (135, 15 + 16 * num))
+                self.blit_rows(phrase)
                 phrase = None
             elif num == 0:
-                text = self.font.render(f'{props[prop]}', True, WHITE)
-                self.surf.blit(text, (135, 15))
+                self.blit_rows(props[prop])
             else:
                 text = self.font.render(f'{num} - {props[prop]}', True, WHITE)
                 self.surf.blit(text, (135, 75 + 20 * num))

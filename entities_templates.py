@@ -82,7 +82,7 @@ class Bob(NPC):
     def __init__(self, name, game, avatar=None):
         NPC.__init__(self, name=name, avatar=avatar)
         self.intro = 'Приветсвую тебя, странник'
-        self.ch_loc = 'Куда ты хочешь отправиться?'
+        self.ch_loc = 'Куда ты хочешь отправиться?\nЧтобы вtрнуться кликни ctrl + m'
         self.kills = 0
         self.game = game
 
@@ -149,7 +149,6 @@ class Bob(NPC):
 
     def choosing_location(self, phrase):
         if phrase == 'В лес':
-            print("Ну лесник получается")
             self.game.current_map = 'forest'
             self.game.dialog.is_open = False
             self.game.change_loc()
@@ -157,6 +156,5 @@ class Bob(NPC):
             self.game.current_map = 'dungeon'
             self.game.dialog.is_open = False
             self.game.change_loc()
-            print("Ну любитель полземелий получается")
         elif phrase == 'Уже не хочу':
             self.dialog_stage = 0

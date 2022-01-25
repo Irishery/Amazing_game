@@ -95,7 +95,6 @@ class Player(pygame.sprite.Sprite):
         max_hp = self.entity.max_hp
         hp = self.entity.hp
 
-        # print(max_hp / 35 * hp)
 
     def render_hp(self, d_rect=None):
         # bar = self.entity.hp / 35 * self.entity.hp
@@ -127,7 +126,6 @@ class Player(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if hits:
             self.entity.hp -= 0.5
-            print('HITS:', self.entity.hp)
         if self.entity.hp <= 0:
             self.kill()
             self.game.respawn()
@@ -363,8 +361,6 @@ class Button:
     def is_pressed(self, pos, pressed):
         if self.rect.collidepoint(pos):
             if pressed[0]:
-                print((self.rect.x, self.rect.y))
-                print(pos)
                 return True
             return False
         return False

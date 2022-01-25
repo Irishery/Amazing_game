@@ -200,7 +200,6 @@ class Inventory:
         self.render_invent_win(screen)
 
         self.invent_open = True
-        print(self.hp)
 
         while self.invent_open:
             for event in pygame.event.get():
