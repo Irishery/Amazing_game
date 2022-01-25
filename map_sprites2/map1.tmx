@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="35" height="35" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="63">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="35" height="35" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="68">
  <tileset firstgid="1" source="tile_set.tsx"/>
  <layer id="1" name="Слой тайлов 1" width="35" height="35">
   <data encoding="csv">
@@ -105,6 +105,11 @@
   <object id="62" name="enemy" x="111" y="798">
    <point/>
   </object>
+  <object id="63" name="block" x="831.875" y="341.75" width="31.875" height="41.875"/>
+  <object id="64" name="block" x="1056" y="342" width="32.0625" height="41.8125"/>
+  <object id="65" name="block" x="991.875" y="53.875" width="32.375" height="42.125"/>
+  <object id="66" name="block" x="831.909" y="54" width="31.9091" height="41.8182"/>
+  <object id="67" name="block" x="704.091" y="54.0909" width="31.8182" height="41.8182"/>
  </objectgroup>
  <layer id="2" name="walls" width="35" height="35">
   <data encoding="csv">
