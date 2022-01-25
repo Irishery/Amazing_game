@@ -1,6 +1,7 @@
 import pygame
 import math
 
+from sprites import Spritesheet
 from config import WIN_HEIGHT, WIN_WIDTH, BLACK, WHITE
 
 
@@ -21,7 +22,6 @@ class Consumable(InventoryItem):
         self.mp_gain = mp_gain
 
     def use(self, target):
-        inventory.remove(self)
         target.addHp(self.hp_gain)
         target.addMP(self.mp_gain)
 
@@ -108,8 +108,6 @@ class Inventory:
         # item sets
         self.cell_size = 50
         self.cell_size = 50
-        self.player_icon_w = 100
-        self.player_icon_h = 100
         # font
         self.font = pygame.font.Font('arialmt.ttf', 16)
         # item info texts
@@ -153,7 +151,8 @@ class Inventory:
 
         item_rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
         item.set_rect(item_rect)
-        return item_rect
+        sprite = pygame.transform.scale(item.img, (50, 50))
+        return sprite, (x, y)
 
     def get_cell(self, mouse_pos):
         cell_x = math.floor((mouse_pos[0] - 135) / self.cell_size)
@@ -171,33 +170,31 @@ class Inventory:
         except Exception as e:
             return None
 
-    def render_invent_win(self, screen):
+    def render_invent_win(self, screen, rend_info=False):
         self.invent_open = True
         self.surf.blit(self.avatar, (15, 15))
 
         for ly, sublist in enumerate(self.items):
             for lx, item in enumerate(sublist):
-                item_rect = self.get_cell_render(item, lx, ly)
-                pygame.draw.rect(self.surf, rect=item_rect, color=WHITE)
+                item_sprite, pos = self.get_cell_render(item, lx, ly)
+                self.surf.blit(item_sprite, (pos[0], pos[1]))
+        if not rend_info:
+            screen.blit(self.surf, (self.pos_x, self.pos_y))
 
-        screen.blit(self.surf, (self.pos_x, self.pos_y))
-
-    def clear_surface(self, screen):
+    def clear_surface(self):
         self.game.draw()
-        self.render_invent_win(screen)
-
-        pygame.display.update()
+        self.surf.fill(BLACK)
 
     def render_item_info(self, screen, item):
-        item_surf = pygame.Surface((50, 50))
-        item_surf.fill(BLACK)
         props = item.get_info()
 
-        self.clear_surface(screen)
+        self.clear_surface()
+        self.render_invent_win(screen, rend_info=True)
         for num, prop in enumerate(props.keys()):
             text = self.font.render(f'{prop}: {props[prop]}', True, WHITE)
             self.texts.append(text)
-            screen.blit(text, (205, 275 + 20 * num))
+            self.surf.blit(text, (135, 195 + 20 * num))
+        screen.blit(self.surf, (self.pos_x, self.pos_y))
 
     def render(self, screen):
         self.render_invent_win(screen)
@@ -209,6 +206,8 @@ class Inventory:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_i:
+                        if self.invent_open:
+                            self.clear_surface()
                         self.invent_open = False
 
                 if event.type == pygame.MOUSEBUTTONDOWN:

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="35" height="35" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="22">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="35" height="35" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="63">
  <tileset firstgid="1" source="tile_set.tsx"/>
  <layer id="1" name="Слой тайлов 1" width="35" height="35">
   <data encoding="csv">
@@ -58,6 +58,51 @@
    <point/>
   </object>
   <object id="21" name="enemy" x="352" y="640">
+   <point/>
+  </object>
+  <object id="22" name="npc" x="798.667" y="518.667">
+   <point/>
+  </object>
+  <object id="25" x="639.333" y="723.333" width="22.6667" height="109.333"/>
+  <object id="26" x="363.333" y="802.667" width="274.667" height="26"/>
+  <object id="27" x="361.333" y="724.667" width="19.3333" height="76"/>
+  <object id="29" name="block" x="360" y="722" width="24" height="109.333"/>
+  <object id="30" name="block" x="384" y="800.667" width="272.667" height="26"/>
+  <object id="31" name="block" x="639.333" y="725.333" width="20" height="72.6667"/>
+  <object id="32" name="block" x="901.5" y="836.25" width="84.75" height="58.75"/>
+  <object id="33" name="block" x="901.25" y="895.5" width="22.75" height="33"/>
+  <object id="34" name="block" x="965.75" y="895.5" width="22.5" height="32.5"/>
+  <object id="35" name="block" x="523.818" y="38.9091" width="40.3636" height="52"/>
+  <object id="36" name="block" x="613.25" y="127.5" width="18.5" height="33.25"/>
+  <object id="37" name="block" x="614.5" y="224.75" width="17.25" height="31.5"/>
+  <object id="38" name="block" x="678.25" y="128.25" width="18" height="31.25"/>
+  <object id="39" name="block" x="677.75" y="224.5" width="18.25" height="31.25"/>
+  <object id="40" name="block" x="43.5" y="70" width="40.5" height="54.25"/>
+  <object id="41" name="block" x="107.5" y="70.25" width="40.5" height="53.75"/>
+  <object id="42" name="block" x="172" y="72" width="39.75" height="52"/>
+  <object id="43" name="block" x="64" y="952" width="29.6667" height="39.6667"/>
+  <object id="44" name="block" x="225" y="952.333" width="30" height="40.3333"/>
+  <object id="45" name="block" x="963" y="449.75" width="86.5" height="62.25"/>
+  <object id="46" name="block" x="835.25" y="190.25" width="24" height="33.25"/>
+  <object id="47" name="block" x="933.75" y="189.25" width="22.75" height="32.25"/>
+  <object id="48" name="block" x="869" y="158.75" width="20.5" height="22.25"/>
+  <object id="49" name="block" x="899.5" y="160.25" width="22.25" height="20.5"/>
+  <object id="50" name="block" x="870.5" y="223.5" width="21" height="32.25"/>
+  <object id="51" name="block" x="901.5" y="224" width="23.5" height="31.5"/>
+  <object id="52" name="block" x="866.25" y="181.75" width="57.5" height="39.5"/>
+  <object id="54" name="block" x="654.25" y="470.5" width="35" height="41.5"/>
+  <object id="55" name="block" x="676.75" y="608" width="19.25" height="33"/>
+  <object id="56" name="block" x="612" y="468.25" width="22.75" height="43.75"/>
+  <object id="57" name="block" x="324.875" y="447.875" width="18.75" height="65.625"/>
+  <object id="58" name="block" x="325.636" y="224" width="17.6364" height="31.4545"/>
+  <object id="59" name="block" x="326.545" y="128.727" width="17.2727" height="30.9091"/>
+  <object id="60" name="enemy" x="527" y="956">
+   <point/>
+  </object>
+  <object id="61" name="enemy" x="105" y="428">
+   <point/>
+  </object>
+  <object id="62" name="enemy" x="111" y="798">
    <point/>
   </object>
  </objectgroup>

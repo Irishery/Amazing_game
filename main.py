@@ -4,7 +4,9 @@ from sprites import *
 from config import *
 from tilemap import *
 from inventory import *
-from character import Character
+from weapon import *
+from dialog_win import *
+from entities_templates import Character, Bob
 
 
 class Game:
@@ -18,30 +20,40 @@ class Game:
         self.character = Character(7, 3, 2, 1)
         self.inventory = Inventory(self.character.hp, self)
 
+        self.bob = Bob('Боб', self)
+        self.dialog = Dialog(500, 300, self.bob, self)
+        self.dialog_accception = False
+
         self.character_spritesheet = Spritesheet("img/character.png")
         self.terrain_spritesheet = Spritesheet("img/terrain.png")
         self.enemy_spritesheet = Spritesheet("img/enemy.png")
+        self.npcs_spritesheet = Spritesheet("NPCs/Bob_sprite.png")
         self.attack_spritesheet = Spritesheet("img/attack.png")
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.go_background = pygame.image.load("img/gameover.png")
-        self.map = TiledMap("map_sprites2/map1.tmx")
+
+        self.current_map = 'lobby'
+        self.not_lobby = False
+        self.map = TiledMap(LOCATIONS[self.current_map])
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
 
     def create_tilemap(self):
         for tile_object in self.map.tmxdata.objects:
-            if tile_object.name == 'block':
+            if tile_object.name == 'block' or tile_object.name == 'wall':
                 Block(self, tile_object.x, tile_object.y,
                       tile_object.width, tile_object.height)
             if tile_object.name == 'player':
-                self.player = Player(self, tile_object.x, tile_object.y)
+                self.player = Player(self, tile_object.x, tile_object.y, self.screen, self.character)
                 self.spawn_point = (tile_object.x, tile_object.y)
             if tile_object.name == 'enemy':
                 Enemy(self, tile_object.x, tile_object.y)
+            if tile_object.name == 'npc':
+                NPC_sprite(self, tile_object.x, tile_object.y)
 
     def respawn(self):
         self.character.hp = 7
-        self.player = Player(self, self.spawn_point[0], self.spawn_point[1])
+        self.player = Player(self, self.spawn_point[0], self.spawn_point[1], self.screen, self.character)
 
     def new(self):
         self.playing = True
@@ -49,8 +61,23 @@ class Game:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
+        self.npcs = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
-        # self.player = Player(self, 10, 10)
+        self.create_tilemap()
+        self.camera = Camera(self.map.width, self.map.height)
+
+    def change_loc(self):
+        self.map = TiledMap(LOCATIONS[self.current_map])
+        if self.current_map != 'lobby':
+            self.not_lobby = True
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
+
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.blocks = pygame.sprite.LayeredUpdates()
+        self.enemies = pygame.sprite.LayeredUpdates()
+        self.npcs = pygame.sprite.LayeredUpdates()
+        self.attacks = pygame.sprite.LayeredUpdates()
         self.create_tilemap()
         self.camera = Camera(self.map.width, self.map.height)
 
@@ -73,6 +100,14 @@ class Game:
                 if event.key == pygame.K_i:
                     self.inventory.render(self.screen)
                     pygame.display.update()
+                if event.key == pygame.K_f and self.dialog_accception:
+                    self.dialog.render(self.screen)
+                    pygame.display.update()
+                elif pygame.key.get_mods() & pygame.KMOD_CTRL:
+                    if event.key == pygame.K_m:
+                        if self.current_map != 'lobby':
+                            self.current_map = 'lobby'
+                            self.change_loc()
 
     def update(self):
         self.all_sprites.update()
@@ -81,8 +116,12 @@ class Game:
     def draw(self):
         pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
+        self.player.render_hp(d_rect=self.camera.apply_rect(self.player.bar_rect, hp_bar=True))
+        self.player.get_hp_bar()
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
+        if self.dialog_accception:
+            self.dialog.daccept_render()
         self.clock.tick(FPS)
         pygame.display.update()
 
@@ -122,7 +161,7 @@ class Game:
     def intro_screen(self):
         intro = True
 
-        title = self.font.render('Amazind game', True, BLACK)
+        title = self.font.render('Amazing game', True, BLACK)
         title_rect = title.get_rect(x=10, y=10)
 
         play_button = Button(10, 50, 100, 50, WHITE, BLACK, 'Play', 32)
@@ -149,22 +188,16 @@ class Game:
 g = Game()
 g.intro_screen()
 g.new()
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 5, 'sword', 'Ukraine'))
-g.inventory.add_item(Weapon('img', 1, 2, 'axe', 'Small axe'))
-g.inventory.add_item(Weapon('img', 1, 0, 'Very low', 'IQ'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
-g.inventory.add_item(Weapon('img', 1, 7, 'axe', 'Great axe'))
+g.inventory.add_item(GreatAxe())
+g.inventory.add_item(Ukraine())
+g.inventory.add_item(GreatAxe())
+g.inventory.add_item(GreatAxe())
+g.inventory.add_item(Ukraine())
+g.inventory.add_item(GreatAxe())
+g.inventory.add_item(GreatAxe())
+g.inventory.add_item(Ukraine())
+g.inventory.add_item(GreatAxe())
+g.inventory.add_item(Ukraine())
 
 
 while g.running:

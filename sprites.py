@@ -16,9 +16,11 @@ class Spritesheet:
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, screen, entity):
         self.game = game
         self._layer = PLAYER_LAYER
+        self.entity = entity
+        self.screen = screen
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
 
@@ -34,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         self.animation_loop = 1
 
         self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
-
+        self.bar_rect = pygame.Rect(self.x, self.y, 35, 10)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -72,9 +74,13 @@ class Player(pygame.sprite.Sprite):
                                  self.game.character_spritesheet.get_sprite(228, 194, 32, 50)]
 
     def update(self):
+
+        self.render_hp()
         self.movement()
+
         self.animate()
         self.collide_enemy()
+        self.collide_npc()
 
         self.rect.x += self.x_change
         self.collide_blocks('x')
@@ -84,33 +90,54 @@ class Player(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
+    def get_hp_bar(self):
+        bar_width = 35
+        max_hp = self.entity.max_hp
+        hp = self.entity.hp
+
+        # print(max_hp / 35 * hp)
+
+    def render_hp(self, d_rect=None):
+        # bar = self.entity.hp / 35 * self.entity.hp
+        rect = pygame.Rect(self.x, self.y, 35, 10)
+        self.bar_rect = rect
+        if d_rect:
+            pygame.draw.rect(self.screen, color=pygame.Color(GREEN), rect=d_rect)
+
     def movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.x_change -= PLAYER_SPEED
+            self.x -= PLAYER_SPEED
             self.facing = 'left'
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.x_change += PLAYER_SPEED
+            self.x += PLAYER_SPEED
             self.facing = 'right'
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
             self.y_change -= PLAYER_SPEED
+            self.y -= PLAYER_SPEED
             self.facing = 'up'
         elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.y += PLAYER_SPEED
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
 
     def collide_enemy(self):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if hits:
-            self.game.character.hp -= 0.5
-            self.attacked()
-        if self.game.character.hp <= 0:
+            self.entity.hp -= 0.5
+            print('HITS:', self.entity.hp)
+        if self.entity.hp <= 0:
             self.kill()
             self.game.respawn()
 
-    def attacked(self):
-        self.rect.x -= 30
-        self.rect.y -= 30
+    def collide_npc(self):
+        hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
+        if hits:
+            self.game.dialog_accception = True
+        else:
+            self.game.dialog_accception = False
 
     def collide_blocks(self, direction):
         if direction == 'x':
@@ -118,9 +145,11 @@ class Player(pygame.sprite.Sprite):
             if hits:
                 if self.x_change > 0:
                     self.rect.x = hits[0].rect.left - self.rect.width
+                    self.x = hits[0].rect.left - self.rect.width
                     return
                 if self.x_change < 0:
                     self.rect.x = hits[0].rect.right
+                    self.x = hits[0].rect.right
                     return
 
         if direction == 'y':
@@ -128,9 +157,11 @@ class Player(pygame.sprite.Sprite):
             if hits:
                 if self.y_change > 0:
                     self.rect.y = hits[0].rect.top - self.rect.height
+                    self.y = hits[0].rect.top - self.rect.height
                     return
                 if self.y_change < 0:
                     self.rect.y = hits[0].rect.bottom
+                    self.y = hits[0].rect.bottom
                     return
 
     def animate(self):
@@ -219,6 +250,8 @@ class Enemy(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
+    # def render_hp
+
     def movement(self):
         if self.facing == 'left':
             self.x_change -= ENEMY_SPEED
@@ -250,6 +283,26 @@ class Enemy(pygame.sprite.Sprite):
                 self.animation_loop += 0.1
                 if self.animation_loop >= 4:
                     self.animation_loop = 1
+
+
+class NPC_sprite(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = ENEMY_LAYER
+        self.groups = self.game.all_sprites, self.game.npcs
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x
+        self.y = y
+        self.width = 29
+        self.height = 46
+
+        self.image = self.game.npcs_spritesheet.get_sprite(4, 0, 32, 46)
+        self.image.set_colorkey(BLACK)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
 
 
 class Block(pygame.sprite.Sprite):
@@ -359,30 +412,34 @@ class Attack(pygame.sprite.Sprite):
 
     def collide(self):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, True)
+        if hits:
+            if self.game.current_map == 'forest':
+                self.game.bob.kills += 1
+                self.game.character.kills += 1
 
     def animate(self):
         direction = self.game.player.facing
 
         if direction == 'up':
             self.image = self.up_animations[math.floor(self.animation_loop)]
-            self.animation_loop += 0.2
+            self.animation_loop += 0.1
             if self.animation_loop >= 3:
                 self.kill()
 
         if direction == 'down':
             self.image = self.down_animations[math.floor(self.animation_loop)]
-            self.animation_loop += 0.2
+            self.animation_loop += 0.1
             if self.animation_loop >= 3:
                 self.kill()
 
         if direction == 'left':
             self.image = self.left_animations[math.floor(self.animation_loop)]
-            self.animation_loop += 0.2
+            self.animation_loop += 0.1
             if self.animation_loop >= 3:
                 self.kill()
 
         if direction == 'right':
             self.image = self.right_animations[math.floor(self.animation_loop)]
-            self.animation_loop += 0.2
+            self.animation_loop += 0.1
             if self.animation_loop >= 3:
                 self.kill()

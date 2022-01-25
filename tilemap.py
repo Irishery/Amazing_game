@@ -35,7 +35,9 @@ class Camera:
     def apply(self, entity):
         return entity.rect.move(self.camera.topleft)
 
-    def apply_rect(self, rect):
+    def apply_rect(self, rect, hp_bar=False):
+        if hp_bar:
+            return rect.move(self.camera.topleft[0], self.camera.topleft[1] - 10)
         return rect.move(self.camera.topleft)
 
     def update(self, target):
