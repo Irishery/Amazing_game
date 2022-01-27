@@ -1,12 +1,15 @@
-import pygame
-import sys
 from sprites import *
-from config import *
+import time
 from tilemap import *
 from inventory import *
 from weapon import *
 from dialog_win import *
 from entities_templates import Character, Bob
+
+
+def write_log(log: str):
+    with open('enter_log.txt', 'a') as f:
+        f.write(log + '\n')
 
 
 class Game:
@@ -199,7 +202,7 @@ g.inventory.add_item(Ukraine())
 g.inventory.add_item(GreatAxe())
 g.inventory.add_item(Ukraine())
 
-
+write_log(f'{time.strftime("%D %H:%M",  time.localtime(time.time()))} - Someone started game')
 while g.running:
     g.main()
     g.game_over()
